@@ -24,7 +24,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://api.skatrium.com/api/:path*", // Proxy to Backend
+        destination: "https://api.skatrium.com/api/:path*",
       },
     ];
   },

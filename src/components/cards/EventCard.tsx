@@ -3,15 +3,22 @@ import React from 'react'
 import { Button } from '../ui/button'
 import EarningDetailsModal from '../modal/EventDetailsModal'
 import { Event } from '@/types'
-import { Image } from 'antd'
+import { Image, Popconfirm } from 'antd'
 import moment from 'moment'
+import { Trash2 } from 'lucide-react'
 
 
-export default function EventCard({ event }: { event: Event }) {
+interface EventCardProps {
+    event: Event
+    onDelete?: (id: string) => void
+    isDeleting?: boolean
+}
+
+export default function EventCard({ event, onDelete, isDeleting = false }: EventCardProps) {
     const [open, setOpen] = React.useState(false)
     return (
         <div>
-            <div className='flex justify-between items-center border border-[#FFFFFF33]/[0.2]  rounded-2xl p-2'>
+            <div className='flex justify-between items-center border border-[#FFFFFF33]/[0.2]  rounded-2xl p-2 gap-2'>
                 <div className='flex gap-x-3'>
                     {event?.coverImage?.url
 
@@ -26,7 +33,30 @@ export default function EventCard({ event }: { event: Event }) {
                         <p className='text-[#CBD5E1]'>{moment(event.date).format('MMM DD, YYYY')}</p>
                     </div>
                 </div>
-                <Button onClick={() => setOpen(true)} size={"sm"} className='bg-[#211604] rounded-full border border-[#FFFFFF33]/[0.2]'>View Details</Button>
+                <div className='flex items-center gap-2'>
+                    {onDelete && (
+                        <Popconfirm
+                            title="Delete this event?"
+                            description="This action cannot be undone."
+                            okText="Delete"
+                            cancelText="Cancel"
+                            okButtonProps={{ danger: true, loading: isDeleting }}
+                            onConfirm={() => onDelete(event._id)}
+                        >
+                            <Button
+                                disabled={isDeleting}
+                                variant="destructive"
+                                size="sm"
+                                aria-label={`Delete ${event.title}`}
+                                className='rounded-full'
+                            >
+                                <Trash2 />
+                                
+                            </Button>
+                        </Popconfirm>
+                    )}
+                    <Button onClick={() => setOpen(true)} size={"sm"} className='bg-[#211604] rounded-full border border-[#FFFFFF33]/[0.2]'>View Details</Button>
+                </div>
             </div>
             <EarningDetailsModal open={open} setOpen={setOpen} event={event} />
         </div>

@@ -3,23 +3,38 @@ import EventCard from '@/components/cards/EventCard'
 import EmptyData from '@/components/shared/EmptyData'
 import PaginationSection from '@/components/shared/PaginationSection'
 import { cn } from '@/lib/utils'
-import { useGetAllEventDataQuery } from '@/redux/api/eventApi'
+import { useDeleteEventMutation, useGetAllEventDataQuery } from '@/redux/api/eventApi'
 import { Event } from '@/types'
 import { Spin } from 'antd'
 import { useSearchParams } from 'next/navigation'
-import React from 'react'
+import React, { useState } from 'react'
+import { toast } from 'sonner'
+import { getActualError } from '@/utils/handleError'
 
 
 export default function EventsContainer() {
+    const [deletingEventId, setDeletingEventId] = useState<string | null>(null)
     const page = useSearchParams().get("page") || "1";
     const limit = useSearchParams().get("limit") || "18";
 
     const queries: Record<string, string> = {};
     if (page) queries["page"] = page;
     if (limit) queries["limit"] = limit;
+    queries["isDeleted"] = "false";
     const { data, isLoading } = useGetAllEventDataQuery(queries);
+    const [deleteEvent] = useDeleteEventMutation();
 
-    console.log(data?.data)
+    const handleDelete = async (id: string) => {
+        setDeletingEventId(id);
+        try {
+            await deleteEvent(id).unwrap();
+            toast.success("Event deleted successfully");
+        } catch (error) {
+            toast.error(getActualError(error) || "Failed to delete event");
+        } finally {
+            setDeletingEventId(null);
+        }
+    };
 
     if (isLoading) {
         return <div className={cn('h-[calc(100vh-200px)] flex items-center justify-center')}><Spin size='large' /></div>
@@ -37,7 +52,12 @@ export default function EventsContainer() {
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-5'>
                 {
                     data?.data?.data?.map((event: Event, index: number) => (
-                        <EventCard key={index} event={event} />
+                        <EventCard
+                            key={event._id || index}
+                            event={event}
+                            onDelete={handleDelete}
+                            isDeleting={deletingEventId === event._id}
+                        />
                     ))
                 }
             </div>
@@ -45,4 +65,3 @@ export default function EventsContainer() {
         </div>
     )
 }
-

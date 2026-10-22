@@ -9,7 +9,12 @@ import { Spin, Tabs, TabsProps } from "antd";
 import React from "react";
 import FAQsContainer from "../../faqs/_components/FAQsContainer";
 
-
+// const userRoles = {
+//   "1": "USER",
+//   "2": "ORGANIZER",
+//   "3": "MARCHANT",
+//   "4": "KAATEDJ",
+// };
 
 const SettingsPage = () => {
   //   const [role, setRole] = useState<string>("USER");

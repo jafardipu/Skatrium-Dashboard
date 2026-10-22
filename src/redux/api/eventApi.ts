@@ -9,9 +9,16 @@ const eventApi = baseApi.injectEndpoints({
         method: "GET",
         params,
       }),
-      providesTags: [tagTypes.dashboard],
+      providesTags: [tagTypes.event, tagTypes.dashboard],
+    }),
+    deleteEvent: builder.mutation({
+      query: (id) => ({
+        url: `/event/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [tagTypes.event, tagTypes.dashboard],
     }),
   }),
 });
 
-export const { useGetAllEventDataQuery } = eventApi;
+export const { useGetAllEventDataQuery, useDeleteEventMutation } = eventApi;

@@ -5,6 +5,7 @@ export interface Faq {
   _id: string;
   question: string;
   answer: string;
+  order?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -16,6 +17,10 @@ export interface CreateFaqPayload {
 
 export interface UpdateFaqPayload extends CreateFaqPayload {
   id: string;
+}
+
+export interface ReorderFaqsPayload {
+  orders: { id: string; order: number }[];
 }
 
 // Matches the API response shape: { data: Faq[] }
@@ -55,6 +60,14 @@ const faqsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.faqs],
     }),
+    reorderFaqs: builder.mutation<FaqsResponse, ReorderFaqsPayload>({
+      query: (data) => ({
+        url: "/faq/faqs/reorder",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: [tagTypes.faqs],
+    }),
   }),
 });
 
@@ -63,4 +76,5 @@ export const {
   useCreateFaqMutation,
   useUpdateFaqMutation,
   useDeleteFaqMutation,
+  useReorderFaqsMutation,
 } = faqsApi;

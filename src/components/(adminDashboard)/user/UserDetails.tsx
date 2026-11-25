@@ -26,6 +26,8 @@ const UserDetails = ({ open: user, setOpen, data }: TPropsType) => {
     ([, value]) => !!value,
   );
 
+  console.log(currentData);
+
   useEffect(() => {
     setCurrentData(data);
   }, [data]);
@@ -157,12 +159,9 @@ const UserDetails = ({ open: user, setOpen, data }: TPropsType) => {
             <div className="flex justify-between gap-3  bg-[#21424617] py-3 px-2 border-b max-w-[550px]">
               <h4>Interests </h4>
               <p className="font-medium capitalize">
-                {currentData?.personalization?.interests?.map(
-                  (interest: string, i: number) =>
-                    i === currentData?.personalization?.interests?.length - 1
-                      ? interest?.split("_").join(" ")
-                      : interest?.split("_").join(", "),
-                )}{" "}
+                {currentData?.personalization?.interests
+                  ?.map((interest: string) => interest?.split("_").join(" "))
+                  .join(", ")}
               </p>
             </div>
           )}

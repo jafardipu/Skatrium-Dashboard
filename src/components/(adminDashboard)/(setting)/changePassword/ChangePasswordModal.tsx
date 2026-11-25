@@ -5,7 +5,6 @@ import { Error_Modal, Success_model } from "@/lib/utils";
 import { logout } from "@/redux/features/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { useChangePasswordMutation } from "@/redux/api/authApi";
-import { useRouter } from "next/navigation";
 
 type TPropsType = {
   open: boolean;
@@ -15,7 +14,6 @@ type TPropsType = {
 const ChangePasswordModal = ({ open, setOpen }: TPropsType) => {
   const [form] = Form.useForm();
 
-  const router = useRouter();
   const [changePassword, { isLoading }] = useChangePasswordMutation();
   const dispatch = useAppDispatch();
   const handleSubmit = async (values: any) => {
@@ -30,7 +28,7 @@ const ChangePasswordModal = ({ open, setOpen }: TPropsType) => {
       }).unwrap();
       Success_model({ title: "Password change successfully!!" });
       dispatch(logout());
-      router.refresh();
+      window.location.href = "/login";
     } catch (error: any) {
       Error_Modal(error?.data?.message);
     }

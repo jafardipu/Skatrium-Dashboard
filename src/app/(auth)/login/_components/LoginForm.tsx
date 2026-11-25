@@ -36,12 +36,16 @@ const LoginForm = () => {
       const res = await login(userData).unwrap();
 
 
-      if (res?.data?.token) {
+      const accessToken = res?.data?.token || res?.data?.accessToken;
+      const refreshToken = res?.data?.refreshToken;
+
+      if (accessToken) {
         Success_model({ title: "Login Successful" });
         dispatch(
           setUser({
-            user: jwtDecode(res?.data?.token),
-            token: res?.data?.token,
+            user: jwtDecode(accessToken),
+            token: accessToken,
+            refreshToken,
           }),
         );
 

@@ -8,7 +8,7 @@ import { Menu, MenuProps } from "antd";
 import Sider from "antd/es/layout/Sider";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const SidebarContainer = ({ collapsed }: { collapsed: boolean }) => {
@@ -16,16 +16,13 @@ const SidebarContainer = ({ collapsed }: { collapsed: boolean }) => {
   const currentPath = usePathname();
 
   const dispatch = useAppDispatch();
-  const router = useRouter();
 
   const onClick: MenuProps["onClick"] = (e) => {
     setCurrent(e.key);
     if (e.key === "logout") {
       dispatch(logout());
-      router.refresh();
-      router.push("/login");
-
       Success_model({ title: "Logout successful" });
+      window.location.href = "/login";
     }
     localStorage.setItem("activeNav", e.key);
   };

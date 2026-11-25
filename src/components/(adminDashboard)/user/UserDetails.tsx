@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import CopyableId from "@/components/shared/CopyableId";
 import { Image, Modal } from "antd";
 import moment from "moment";
 import Link from "next/link";
@@ -74,6 +75,11 @@ const UserDetails = ({ open: user, setOpen, data }: TPropsType) => {
           {currentData?.about}
         </div>
         <div className="mt-5">
+          <div className="flex justify-between gap-1.5 items-center bg-[#21424617] py-3 px-2 border-b ">
+            <h4>User ID </h4>
+            <CopyableId id={currentData?._id} />
+          </div>
+
           <div className="flex justify-between gap-1.5 bg-[#21424617] py-3 px-2 border-b ">
             <h4>User name </h4>
             <p className="font-medium">{currentData?.fullName}</p>

@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { TUser } from "@/types";
+import {
+  ACCESS_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+} from "@/utils/authTokens";
 import { createSlice } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 
@@ -21,18 +25,21 @@ const authSlice = createSlice({
       state.user = user;
       state.token = token;
 
-      // Store token in Cookies for middleware authentication
-      Cookies.set("skatrium-access-token", token, { path: "/" });
-      // Cookies.set("refresh-token", refreshToken, { path: "/" });
+      if (token) {
+        Cookies.set(ACCESS_TOKEN_COOKIE, token, { path: "/" });
+      }
+
+      if (refreshToken) {
+        Cookies.set(REFRESH_TOKEN_COOKIE, refreshToken, { path: "/" });
+      }
     },
 
     logout: (state) => {
       state.user = null;
       state.token = null;
 
-      // Remove token from cookie
-      Cookies.remove("skatrium-access-token", { path: "/" });
-      // Cookies.remove("refresh-token", { path: "/" });
+      Cookies.remove(ACCESS_TOKEN_COOKIE, { path: "/" });
+      Cookies.remove(REFRESH_TOKEN_COOKIE, { path: "/" });
     },
   },
 });

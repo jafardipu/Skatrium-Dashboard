@@ -11,6 +11,7 @@ import { useDebounce } from "use-debounce";
 import BlockUser from "@/components/shared/BlockUser";
 import { cn } from "@/lib/utils";
 import UserDelete from "@/components/shared/DeleteUser";
+import CopyableId from "@/components/shared/CopyableId";
 
 type TUser = {
   _id: number;
@@ -58,6 +59,11 @@ const UserTable = () => {
           }`}
         </p>
       ),
+    },
+    {
+      title: "User ID",
+      dataIndex: "_id",
+      render: (id) => <CopyableId id={id} previewLast4 />,
     },
     {
       title: "User",

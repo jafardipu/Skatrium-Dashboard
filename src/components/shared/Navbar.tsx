@@ -17,7 +17,6 @@ import { TUser } from "@/types";
 import { Flex, Image } from "antd";
 import { ChevronRight, X } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { FaBars } from "react-icons/fa6";
 
 type TNavbarProps = {
@@ -31,7 +30,6 @@ const Navbar = ({ collapsed, setCollapsed }: TNavbarProps) => {
   const { data, isLoading } = useGetMyProfileQuery([]);
   const user = data?.data as TUser;
   const dispatch = useAppDispatch();
-  const router = useRouter();
 
   return (
     <div className='flex items-center justify-between w-[97%] font-poppins text-text-color xl:px-8 px-4'>
@@ -115,7 +113,7 @@ const Navbar = ({ collapsed, setCollapsed }: TNavbarProps) => {
                 </MenubarItem>
               </Link>
               <MenubarSeparator />
-              <div onClick={() => { dispatch(logout()); router.refresh() }} >
+              <div onClick={() => { dispatch(logout()); window.location.href = "/login"; }} >
                 <MenubarItem className='hover:bg-gray-100 cursor-pointer'>Logout</MenubarItem>
               </div>
             </MenubarContent>

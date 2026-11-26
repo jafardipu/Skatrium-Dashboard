@@ -1,5 +1,6 @@
 "use client";
 import AboutUsEditor from "@/components/(adminDashboard)/(setting)/aboutUs/AboutUsEditor";
+import CommissionSettings from "@/components/(adminDashboard)/(setting)/commission/CommissionSettings";
 import MissionStatement from "@/components/(adminDashboard)/(setting)/missionStatement/MissionStatement";
 import PrivacyPolicyEditor from "@/components/(adminDashboard)/(setting)/privacyPolicy/PrivacyPolicyEditor";
 // import SettingContainer from "@/components/(adminDashboard)/(setting)/SettingContainer";
@@ -29,8 +30,6 @@ const SettingsPage = () => {
     );
   }
 
-  console.log(data?.data);
-
   const privacyPolicy = data?.data?.find(
     (content: any) => content?.type === "privacy_policy",
   );
@@ -45,6 +44,11 @@ const SettingsPage = () => {
   );
 
   const items: TabsProps["items"] = [
+    {
+      key: "commission",
+      label: "Commission",
+      children: <CommissionSettings />,
+    },
     {
       key: "1",
       label: "Privacy Policy",
@@ -72,10 +76,7 @@ const SettingsPage = () => {
     },
   ];
 
-  return (
-    <Tabs defaultActiveKey="1" items={items} />
-    // <SettingContainer></SettingContainer>
-  );
+  return <Tabs defaultActiveKey="commission" items={items} />;
 };
 
 export default SettingsPage;

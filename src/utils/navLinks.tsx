@@ -1,7 +1,7 @@
 import { RiDashboardHorizontalFill } from "react-icons/ri";
 import { GoPeople } from "react-icons/go";
 import Link from "next/link";
-import { BellDot, CircleAlert, Mail, Megaphone, SquareStack } from "lucide-react";
+import { BellDot, CircleAlert, Mail, Megaphone, Package, SquareStack } from "lucide-react";
 import { IoSettingsOutline } from "react-icons/io5";
 import { BsPatchQuestion } from "react-icons/bs";
 
@@ -15,6 +15,11 @@ export const navLinks = [
     key: "users",
     icon: <GoPeople size={18} />,
     label: <Link href={"/admin/users"}>Profiles</Link>,
+  },
+  {
+    key: "products",
+    icon: <Package size={18} />,
+    label: <Link href={"/admin/products"}>Products</Link>,
   },
   {
     key: "subscribe-email",

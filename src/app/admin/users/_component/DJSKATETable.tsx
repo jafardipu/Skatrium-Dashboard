@@ -4,40 +4,40 @@ import DataTable from "@/utils/DataTable";
 import { Eye } from "lucide-react";
 import moment from "moment";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
 import BlockUser from "@/components/shared/BlockUser";
 import { useSearchParams } from "next/navigation";
-import {
-  useGetAllUserQuery,
-  useGetUsersByRoleQuery,
-} from "@/redux/api/userApi";
+import { useGetAllUserQuery } from "@/redux/api/userApi";
 import { useDebounce } from "use-debounce";
 import UserDelete from "@/components/shared/DeleteUser";
 import DJSKATETUserDetails from "@/components/(adminDashboard)/user/DJSKATETUserDetails";
+import AccountStatusBadge from "@/components/shared/AccountStatusBadge";
+import SubscriptionCell from "@/components/shared/SubscriptionCell";
+import { extractUsersList } from "@/utils/subscriptionHelpers";
 
 type TUser = {
-  _id: number;
+  _id: string | number;
   fullName: string;
   email: string;
   date: string;
   status: string;
   isActive: boolean;
-  image: {
-    url: string;
-  };
+  image: { url: string };
+  accountStatus?: string;
+  subscription?: any;
+  subscriptionExpired?: boolean;
+  createdAt?: string;
 };
 
 const DJSKATETable = () => {
-  const page = useSearchParams().get("page") || "1";
-  const limit = useSearchParams().get("limit") || "12";
+  const searchParams = useSearchParams();
+  const page = searchParams.get("page") || "1";
+  const limit = searchParams.get("limit") || "12";
   const [searchText, setSearchText] = useState("");
   const [searchValue] = useDebounce(searchText, 500);
   const [open, setOpen] = useState<boolean>(false);
   const [currentData, setCurrentData] = useState<TUser>();
 
-  //  set queries
-  const queries: Record<string, string> = {};
+  const queries: Record<string, string> = { role: "KAATEDJ" };
   if (page) queries.page = page;
   if (limit) queries.limit = limit;
   if (searchValue) {
@@ -45,17 +45,16 @@ const DJSKATETable = () => {
     delete queries.limit;
     queries.search = searchValue;
   }
-  queries.role = "KAATEDJ";
 
   const { data: usersData, isLoading } = useGetAllUserQuery(queries);
+  const { users, total } = extractUsersList(usersData);
 
   const columns: TableProps<TUser>["columns"] = [
     {
       title: "ID",
       dataIndex: "id",
-      //align: "center",
       render: (_, __, index) => (
-        <p>
+        <p className="text-[#cad1d6]">
           {`# ${
             Number(page) === 1
               ? index + 1
@@ -67,7 +66,6 @@ const DJSKATETable = () => {
     {
       title: "User",
       dataIndex: "fullName",
-      //align: "center",
       render: (text, record) => (
         <div className="flex items-center gap-x-3">
           {record?.image?.url ? (
@@ -77,42 +75,41 @@ const DJSKATETable = () => {
               width={40}
               height={40}
               className="size-10 aspect-square object-cover rounded-full"
-            ></Image>
+            />
           ) : (
             <div className="size-10 aspect-square object-cover rounded-full bg-[#312912] flex items-center justify-center text-white text-sm font-semibold">
               {record?.fullName?.charAt(0).toUpperCase()}
             </div>
           )}
-          <p className="font-bold">{text}</p>
+          <p className="font-bold text-[#cad1d6]">{text}</p>
         </div>
       ),
     },
     {
       title: "Email",
       dataIndex: "email",
-      //align: "center",
+      render: (text) => <span className="text-[#cad1d6]">{text}</span>,
+    },
+    {
+      title: "Account status",
+      dataIndex: "accountStatus",
+      render: (_, record) => <AccountStatusBadge user={record} />,
+    },
+    {
+      title: "Subscription",
+      dataIndex: "subscription",
+      render: (_, record) => <SubscriptionCell user={record} />,
     },
     {
       title: "Join Date",
       dataIndex: "createdAt",
-      //align: "center",
-      render: (text) => <p>{moment(text).format("LL")}</p>,
-    },
-    {
-      title: "Status",
-      dataIndex: "isActive",
-      //align: "center",
       render: (text) => (
-        <p className={cn("text-[#4BB54B]", !text && "text-[#ee0808]")}>
-          {text ? "Active" : "Blocked"}
-        </p>
+        <p className="text-[#cad1d6]">{moment(text).format("LL")}</p>
       ),
     },
-
     {
       title: "Action",
       dataIndex: "action",
-      //align: "center",
       render: (_, record) => (
         <div className="flex items-center gap-2">
           <Eye
@@ -133,8 +130,8 @@ const DJSKATETable = () => {
 
   return (
     <div className="border border-[#FFFFFF33]/[0.2] rounded-t-xl">
-      <div className="flex items-center justify-between py-2 px-2">
-        <h4 className="text-xl font-semibold text-[#cad1d6]">All Merchant</h4>
+      <div className="flex items-center justify-between gap-3 flex-wrap py-2 px-2">
+        <h4 className="text-xl font-semibold text-[#cad1d6]">All Skate DJ</h4>
         <Input.Search
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
@@ -146,16 +143,12 @@ const DJSKATETable = () => {
       <div className="rounded-2xl">
         <DataTable
           columns={columns}
-          data={usersData?.data}
+          data={users}
           isLoading={isLoading}
           pageSize={Number(limit)}
-          total={usersData?.meta?.total}
-        ></DataTable>
-        <DJSKATETUserDetails
-          open={open}
-          setOpen={setOpen}
-          data={currentData}
-        ></DJSKATETUserDetails>
+          total={total}
+        />
+        <DJSKATETUserDetails open={open} setOpen={setOpen} data={currentData} />
       </div>
     </div>
   );

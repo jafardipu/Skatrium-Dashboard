@@ -1,5 +1,7 @@
-import { cn } from "@/lib/utils";
 import CopyableId from "@/components/shared/CopyableId";
+import AccountStatusBadge from "@/components/shared/AccountStatusBadge";
+import ExpiredSubscriptionBanner from "@/components/(adminDashboard)/user/ExpiredSubscriptionBanner";
+import SubscriptionCard from "@/components/(adminDashboard)/user/SubscriptionCard";
 import { Image, Modal } from "antd";
 import moment from "moment";
 import Link from "next/link";
@@ -25,8 +27,6 @@ const UserDetails = ({ open: user, setOpen, data }: TPropsType) => {
   const socialLinkEntries = Object.entries(socialLinks).filter(
     ([, value]) => !!value,
   );
-
-  console.log(currentData);
 
   useEffect(() => {
     setCurrentData(data);
@@ -58,6 +58,7 @@ const UserDetails = ({ open: user, setOpen, data }: TPropsType) => {
             />
           </div>
         </div>
+        <ExpiredSubscriptionBanner user={currentData} />
         <div className="w-fit mx-auto relative">
           {currentData?.image?.url ? (
             <Image
@@ -123,16 +124,9 @@ const UserDetails = ({ open: user, setOpen, data }: TPropsType) => {
             <h4>Streak Progress </h4>
             <p className='font-medium'>5 days streak</p>
           </div>*/}
-          <div className="flex justify-between gap-1.5  bg-[#21424617] py-3 px-2 border-b">
-            <h4>Status </h4>
-            <p
-              className={cn(
-                "text-[#4BB54B]",
-                !currentData?.isActive && "text-[#ee0808]",
-              )}
-            >
-              {currentData?.isActive ? "Active" : "Blocked"}
-            </p>
+          <div className="flex justify-between gap-1.5 items-center bg-[#21424617] py-3 px-2 border-b">
+            <h4>Account status </h4>
+            <AccountStatusBadge user={currentData} />
           </div>
           <div className="flex justify-between gap-1.5 bg-[#21424617] py-3 px-2 border-b">
             <h4>How did you hear </h4>
@@ -172,6 +166,8 @@ const UserDetails = ({ open: user, setOpen, data }: TPropsType) => {
               {moment(currentData?.createdAt).format("LL")}
             </p>
           </div>
+
+          <SubscriptionCard user={currentData} />
 
           {/* ========================== social links ============================== */}
 

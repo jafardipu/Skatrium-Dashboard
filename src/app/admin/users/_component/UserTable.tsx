@@ -9,31 +9,37 @@ import { useGetAllUserQuery } from "@/redux/api/userApi";
 import { useSearchParams } from "next/navigation";
 import { useDebounce } from "use-debounce";
 import BlockUser from "@/components/shared/BlockUser";
-import { cn } from "@/lib/utils";
 import UserDelete from "@/components/shared/DeleteUser";
 import CopyableId from "@/components/shared/CopyableId";
+import AccountStatusBadge from "@/components/shared/AccountStatusBadge";
+import SubscriptionCell from "@/components/shared/SubscriptionCell";
+import { extractUsersList } from "@/utils/subscriptionHelpers";
 
 type TUser = {
-  _id: number;
+  _id: string | number;
   fullName: string;
   email: string;
   date: string;
   status: string;
-  isActive: string;
+  isActive: boolean;
   image: {
     url: string;
   };
+  accountStatus?: string;
+  subscription?: any;
+  subscriptionExpired?: boolean;
+  createdAt?: string;
 };
 
 const UserTable = () => {
-  const page = useSearchParams().get("page") || "1";
-  const limit = useSearchParams().get("limit") || "12";
+  const searchParams = useSearchParams();
+  const page = searchParams.get("page") || "1";
+  const limit = searchParams.get("limit") || "12";
   const [searchText, setSearchText] = useState("");
   const [searchValue] = useDebounce(searchText, 500);
   const [currentData, setCurrentData] = useState<TUser>();
   const [open, setOpen] = useState<boolean>(false);
 
-  //  set queries
   const queries: Record<string, string> = {};
   queries.role = "USER";
   if (page) queries.page = page;
@@ -45,13 +51,14 @@ const UserTable = () => {
   }
 
   const { data: usersData, isLoading } = useGetAllUserQuery(queries);
+  const { users, total } = extractUsersList(usersData);
 
   const columns: TableProps<TUser>["columns"] = [
     {
       title: "Serial",
       dataIndex: "serial",
       render: (_, __, index) => (
-        <p>
+        <p className="text-[#cad1d6]">
           {`# ${
             Number(page) === 1
               ? index + 1
@@ -68,7 +75,6 @@ const UserTable = () => {
     {
       title: "User",
       dataIndex: "fullName",
-      //align: "center",
       render: (text, record) => (
         <div className="flex items-center gap-x-3">
           {record?.image?.url ? (
@@ -78,41 +84,41 @@ const UserTable = () => {
               width={40}
               height={40}
               className="size-10 aspect-square object-cover rounded-full"
-            ></Image>
+            />
           ) : (
             <div className="size-10 aspect-square object-cover rounded-full bg-[#312912] flex items-center justify-center text-white text-sm font-semibold">
               {record.fullName?.charAt(0).toUpperCase()}
             </div>
           )}
-          <p className="font-bold">{text}</p>
+          <p className="font-bold text-[#cad1d6]">{text}</p>
         </div>
       ),
     },
     {
       title: "Email",
       dataIndex: "email",
-      //align: "center",
+      render: (text) => <span className="text-[#cad1d6]">{text}</span>,
+    },
+    {
+      title: "Account status",
+      dataIndex: "accountStatus",
+      render: (_, record) => <AccountStatusBadge user={record} />,
+    },
+    {
+      title: "Subscription",
+      dataIndex: "subscription",
+      render: (_, record) => <SubscriptionCell user={record} />,
     },
     {
       title: "Join Date",
       dataIndex: "createdAt",
-      //align: "center",
-      render: (text) => <p>{moment(text).format("LL")}</p>,
-    },
-    {
-      title: "Status",
-      dataIndex: "isActive",
-      //align: "center",
       render: (text) => (
-        <p className={cn("text-[#4BB54B]", !text && "text-[#ee0808]")}>
-          {text ? "Active" : "Blocked"}
-        </p>
+        <p className="text-[#cad1d6]">{moment(text).format("LL")}</p>
       ),
     },
     {
       title: "Action",
       dataIndex: "action",
-      //align: "center",
       render: (_, record) => (
         <div className="flex items-center gap-2">
           <Eye
@@ -133,7 +139,7 @@ const UserTable = () => {
 
   return (
     <div className="border border-[#FFFFFF33]/[0.2] rounded-t-xl">
-      <div className="flex items-center justify-between py-2 px-2">
+      <div className="flex items-center justify-between gap-3 flex-wrap py-2 px-2">
         <h4 className="text-xl font-semibold text-[#cad1d6]">All users</h4>
         <Input.Search
           value={searchText}
@@ -146,16 +152,12 @@ const UserTable = () => {
       <div className="rounded-2xl">
         <DataTable
           columns={columns}
-          data={usersData?.data}
+          data={users}
           isLoading={isLoading}
           pageSize={Number(limit)}
-          total={usersData?.meta?.total}
-        ></DataTable>
-        <UserDetails
-          open={open}
-          setOpen={setOpen}
-          data={currentData}
-        ></UserDetails>
+          total={total}
+        />
+        <UserDetails open={open} setOpen={setOpen} data={currentData} />
       </div>
     </div>
   );
